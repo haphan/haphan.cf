@@ -2,15 +2,17 @@
 
 IMAGE = haphan/haphan-cf
 INSTANCE = haphan-cf-default
+VERSION := $(shell date '+%y%m%d.%H%M%S')
 
-default: build push deploy
+default: build push
 
 build:
 	hugo
-	docker build --tag $(IMAGE):latest .
+	docker build --tag $(IMAGE):latest --tag $(IMAGE):$(VERSION) .
 
 push:
 	docker push $(IMAGE):latest
+	docker push $(IMAGE):$(VERSION)
 
 run:
 	-docker rm -f $(INSTANCE)
