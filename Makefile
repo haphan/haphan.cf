@@ -3,6 +3,8 @@
 IMAGE = haphan/haphan-cf
 INSTANCE = haphan-cf-default
 
+default: build push deploy
+
 build:
 	hugo
 	docker build --tag $(IMAGE):latest .
