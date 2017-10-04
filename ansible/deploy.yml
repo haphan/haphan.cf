@@ -1,0 +1,35 @@
+---
+
+- hosts: all
+  vars:
+    image: haphan/haphan-cf
+    instance: haphan-cf
+    vhosts: 'www.haphan.cf, haphan.cf'
+  tasks:
+    - name:
+      docker_image:
+        name: '{{ image }}'
+        force: yes
+        state: present
+
+    - name: Ensure reverse proxy is up
+      docker_container:
+        name: reverse-proxy
+        state: started
+        restart_policy: 'unless-stopped'
+        image: jwilder/nginx-proxy:alpine
+        recreate: yes
+        volumes:
+          - '/var/run/docker.sock:/tmp/docker.sock:ro'
+        ports:
+          - '80:80'
+          - '443:443'
+
+    - name: Deploy sttconnect container
+      docker_container:
+        name: '{{ instance }}'
+        image: '{{ image }}'
+        state: started
+        restart_policy: always
+        env:
+          VIRTUAL_HOST: '{{ vhosts }}'
